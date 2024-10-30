@@ -1,0 +1,12 @@
+{
+  "name": "blazor_server_wind",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "watch": "npx tailwindcss -i ./Themes/theme.css -o ./wwwroot/css/theme.css  --watch",
+    "build": "npx tailwindcss -i ./Themes/theme.css -o ./wwwroot/css/theme.min.css  --minify"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

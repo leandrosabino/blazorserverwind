@@ -1,0 +1,44 @@
+﻿@page "/callback"
+@inject SupabaseService SupabaseService
+@inject NavigationManager NavigationManager
+
+<h3>Processando autenticação...</h3>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("code", out var code))
+            {
+                // Usa o código para autenticar e obter a sessão
+                var session = await SupabaseService.ArmazenarSessaoComCodigoOAuth(code);
+
+                if (session != null)
+                {
+                    var usuarioAtual = await SupabaseService.ObterUsuarioAtual();
+
+                    if (usuarioAtual != null)
+                    {
+                        string displayName = usuarioAtual.DisplayName ?? "Usuário";
+                        NavigationManager.NavigateTo($"/dashboard?displayName={Uri.EscapeDataString(displayName)}");
+                    }
+                    else
+                    {
+                        NavigationManager.NavigateTo("/login?error=auth_failed");
+                    }
+                }
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/login?error=invalid_callback");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao autenticar: {ex.Message}");
+            NavigationManager.NavigateTo("/login?error=auth_exception");
+        }
+    }
+}
